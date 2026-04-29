@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass max-w-md mx-auto p-2-5 my-2">
+    <h2 class="text-center mb-1 text-primary">Institution Access</h2>
+    <p class="text-center text-muted mb-2 text-sm">Secure sign-in for verified academic profiles.</p>
+    
+    <form method="POST" action="/login/">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Username / Academic ID</label>
+            <input type="text" name="username" class="form-control" required placeholder="Enter your username">
+        </div>
+        
+        <div class="form-group">
+            <label>Secure Password</label>
+            <input type="password" name="password" class="form-control" required placeholder="Enter your password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary w-full mt-1 p-0-8">Sign In to Dashboard</button>
+    </form>
+    
+    <p class="text-center mt-2 text-muted text-sm">
+        New candidate? <a href="/signup/" class="text-primary font-bold no-underline">Register for Registry</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduCore | Institutional Governance System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5L2 10z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            EduCore
+        </a>
+        <div class="nav-links">
+            <a href="/" class="btn btn-nav font-bold">Home</a>
+            <a href="/#about" class="btn btn-nav font-bold">About Us</a>
+            {% if user.is_authenticated %}
+            {% if user.userprofile.role == 'admin' %}
+            <a href="/admin_dashboard/" class="btn btn-nav font-bold">Admin Panel</a>
+            {% elif user.userprofile.role == 'student' %}
+            <a href="/student_dashboard/" class="btn btn-nav font-bold">Student Portal</a>
+            {% elif user.userprofile.role == 'report' %}
+            <a href="/report_dashboard/" class="btn btn-nav font-bold">Analytics</a>
+            {% endif %}
+
+            <div style="width: 1px; height: 16px; background: var(--slate-200); margin: 0 0.5rem;"></div>
+            <a href="/logout/" class="btn btn-outline" style="padding: 0.5rem 1rem; border-radius: 8px;">Sign Out</a>
+            {% else %}
+            <a href="/login/" class="btn btn-nav font-bold">Login</a>
+            <a href="/signup/" class="btn btn-primary">Establish Account</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="badge badge-{% if message.tags == 'error' %}poor{% elif message.tags == 'success' %}excellent{% else %}average{% endif %}"
+                style="width: 100%; padding: 1rem 1.5rem; justify-content: flex-start; border-radius: var(--radius-md); margin-bottom: 2rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <footer style="padding: 4rem 2rem; text-align: center; background: white; border-top: 1px solid var(--slate-200);">
+        <p class="font-bold text-primary mb-1" style="font-family: 'Outfit'; font-size: 1.1rem;">EduCore Global
+            Education</p>
+        <p class="text-muted" style="font-size: 0.875rem;">&copy; 2026 Institutional Management Systems. Powered by
+            Intellect.</p>
+    </footer>
+</body>
+
+</html>

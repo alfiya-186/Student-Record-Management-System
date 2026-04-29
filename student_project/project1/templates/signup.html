@@ -1,0 +1,110 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass max-w-md mx-auto p-2-5 my-2">
+    <h2 class="text-center mb-2 text-primary font-bold">Portal Registration</h2>
+    <p class="text-center text-muted text-sm mb-2">Initialize your academic profile to access resources.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="full_name" class="form-control" required placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+            <label>Username / Account ID</label>
+            <input type="text" name="username" class="form-control" required placeholder="Choose a unique username">
+        </div>
+
+        <div class="form-group">
+            <label>Institutional Email</label>
+            <input type="email" name="email" class="form-control" required placeholder="Enter your email address">
+        </div>
+
+        <div class="form-group">
+            <label>Gender Identity</label>
+            <div style="display: flex; gap: 1.5rem; padding: 0.5rem 0;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                    <input type="radio" name="gender" value="male" required> Male
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                    <input type="radio" name="gender" value="female"> Female
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                    <input type="radio" name="gender" value="other"> Other
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Academic Access Role</label>
+            <select name="role" id="roleSelect" class="form-control" required>
+                <option value="student">Student Candidate</option>
+                <option value="admin">Institutional Administrator</option>
+                <option value="report">Academic Auditor</option>
+            </select>
+        </div>
+
+        <!-- Student-only fields -->
+        <div id="studentFields">
+            <div class="form-group">
+                <label>Program to Enroll</label>
+                <select name="course" id="courseSelect" class="form-control">
+                    <option value="" selected disabled>Select academic program</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}" data-duration="{{ course.duration }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+                <p id="durationInfo" class="text-sm text-primary font-bold mt-0-5" style="display: none;"></p>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Secure Password</label>
+            <input type="password" name="password" class="form-control" required placeholder="Create a password">
+        </div>
+        
+        <div class="form-group">
+            <label>Confirm Security Key</label>
+            <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm your password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary w-full mt-1 p-0-8">Initialize Account</button>
+    </form>
+    
+    <p class="text-center mt-2 text-muted text-sm">
+        Existing member? <a href="/login/" class="text-primary no-underline font-bold">Secure Sign In</a>
+    </p>
+</div>
+
+<script>
+    const roleSelect = document.getElementById('roleSelect');
+    const studentFields = document.getElementById('studentFields');
+    const courseSelect = document.getElementById('courseSelect');
+    const durationInfo = document.getElementById('durationInfo');
+
+    roleSelect.addEventListener('change', () => {
+        if (roleSelect.value === 'student') {
+            studentFields.style.display = 'block';
+            courseSelect.required = true;
+        } else {
+            studentFields.style.display = 'none';
+            courseSelect.required = false;
+        }
+    });
+
+    courseSelect.addEventListener('change', () => {
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const duration = selectedOption.getAttribute('data-duration');
+        if (duration) {
+            durationInfo.textContent = `Program Duration: ${duration} Years`;
+            durationInfo.style.display = 'block';
+        } else {
+            durationInfo.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
