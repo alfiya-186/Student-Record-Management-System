@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass max-w-lg mx-auto p-2-5 my-2">
+    <div class="page-header" style="margin-bottom: 2rem;">
+        <div>
+            <h2 class="text-2xl font-bold">Academic Enrollment</h2>
+            <p class="text-muted text-sm">Submit your institutional application for program certification.</p>
+        </div>
+        <a href="/student_dashboard/" class="btn btn-outline text-sm">Cancel</a>
+    </div>
+    
+    <div class="glass mb-2 p-1-5" style="background: var(--slate-50); border: 1px dashed var(--slate-300);">
+        <p class="text-xs text-muted font-bold uppercase tracking-wider">Academic Policy</p>
+        <p class="text-xs text-slate-600">The standard year duration defined by the registrar will be automatically enforced upon program selection.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Academic Program Catalog</label>
+            <select name="course" id="course_select" class="form-control" required onchange="updateYearOptions()">
+                <option value="">-- Select Instituional Program --</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}" data-duration="{{ course.duration }}">{{ course.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Target Academic Year</label>
+            <select name="year" id="year_select" class="form-control" required disabled>
+                <option value="">-- Select Program First --</option>
+            </select>
+            <div id="duration_hint" class="badge badge-good mt-1 w-full" style="display: none; justify-content: center;"></div>
+        </div>
+        
+        <div class="pt-1 mt-2 border-t" style="border-top: 1px solid var(--slate-100); padding-top: 2rem;">
+            <button type="submit" id="submit_btn" class="btn btn-primary w-full" disabled>Submit Enrollment Application</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function updateYearOptions() {
+    const select = document.getElementById('course_select');
+    const yearSelect = document.getElementById('year_select');
+    const hint = document.getElementById('duration_hint');
+    const submitBtn = document.getElementById('submit_btn');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    // Clear existing options
+    yearSelect.innerHTML = '';
+    
+    if (selectedOption.value) {
+        const duration = parseInt(selectedOption.getAttribute('data-duration'));
+        
+        // Add new options up to duration
+        for (let i = 1; i <= duration; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = `Academic Year ${i}`;
+            yearSelect.appendChild(opt);
+        }
+        
+        hint.innerText = `CERTIFIED DURATION: ${duration} YEARS`;
+        hint.style.display = 'flex';
+        yearSelect.disabled = false;
+        submitBtn.disabled = false;
+    } else {
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.innerHTML = '-- Select Program First --';
+        yearSelect.appendChild(defaultOpt);
+        
+        hint.style.display = 'none';
+        yearSelect.disabled = true;
+        submitBtn.disabled = true;
+    }
+}
+</script>
+{% endblock %}

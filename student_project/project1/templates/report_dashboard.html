@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-2xl font-bold">Institutional Analytics Engine</h2>
+        <p class="text-muted">High-fidelity summary of academic performance metrics and system-wide reach.</p>
+    </div>
+    <div class="flex gap-1 flex-center">
+        <a href="/admin_dashboard/" class="btn btn-outline" style="padding: 0.6rem 1rem;">Back</a>
+        <a href="/report_archive/" class="btn btn-primary" style="padding: 0.6rem 1.25rem;">Global Performance Archive</a>
+    </div>
+</div>
+
+<!-- Performance Overview Cards -->
+<div class="dashboard-grid">
+    <div class="glass stat-card" style="border-top: 4px solid var(--success);">
+        <p class="text-muted" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Qualified Students</p>
+        <div class="stat-value text-success" style="font-size: 3.5rem;">{{ passed_count }}</div>
+        <div class="badge badge-excellent" style="margin: 0 auto;">CERTIFIED PASS</div>
+        <p class="text-xs text-muted mt-1">Threshold: <strong class="text-success">40% Average</strong></p>
+    </div>
+
+    <div class="glass stat-card" style="border-top: 4px solid var(--danger);">
+        <p class="text-muted" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Underperforming</p>
+        <div class="stat-value text-danger" style="font-size: 3.5rem;">{{ failed_count }}</div>
+        <div class="badge badge-poor" style="margin: 0 auto;">REMEDIAL QUEUE</div>
+        <p class="text-xs text-muted mt-1">Requires Academic Review</p>
+    </div>
+
+    <div class="glass stat-card" style="border-top: 4px solid var(--primary);">
+        <p class="text-muted" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Success Rate</p>
+        <div class="stat-value text-primary" style="font-size: 3.5rem;">
+            {% if passed_count|add:failed_count > 0 %}
+                {% widthratio passed_count passed_count|add:failed_count 100 %}%
+            {% else %}
+                0%
+            {% endif %}
+        </div>
+        <div class="badge badge-good" style="margin: 0 auto;">TOTAL KPI</div>
+        <p class="text-xs text-muted mt-1">Institutional Weighted Average</p>
+    </div>
+</div>
+
+<div class="page-header mt-2" style="margin-bottom: 2rem;">
+    <h3 class="font-bold">Program Reach & Enrollment Density</h3>
+</div>
+
+<div class="dashboard-grid">
+    {% for course in course_stats %}
+    <div class="glass card-hover" style="padding: 2rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <h3 class="text-xl font-bold mb-1">{{ course.name }}</h3>
+        <p class="text-muted" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Total Registrations</p>
+        <div class="stat-value" style="font-size: 2.5rem; margin: 0.5rem 0;">{{ course.student_count }}</div>
+        <div class="mt-auto w-full">
+            <a href="/course_report/{{ course.id }}/" class="btn btn-outline w-full" style="font-size: 0.75rem; padding: 0.5rem;">Analyze Detail</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

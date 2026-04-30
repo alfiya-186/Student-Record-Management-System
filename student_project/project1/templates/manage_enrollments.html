@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-2xl font-bold">Admissions Processing</h2>
+        <p class="text-muted">Review institutional applications for enrollment certification.</p>
+    </div>
+    <div class="flex gap-1 flex-center">
+        <span class="badge badge-average" style="padding: 0.6rem 1rem;">{{ enrollments|length }} Pending Requests</span>
+        <a href="/admin_dashboard/" class="btn btn-outline" style="padding: 0.5rem 1rem;">Back</a>
+    </div>
+</div>
+
+<div class="table-responsive glass">
+    <table>
+        <thead>
+            <tr>
+                <th>Registration Date</th>
+                <th>Candidate Profile</th>
+                <th>Program Selection</th>
+                <th>Academic Year</th>
+                <th style="text-align: right;">Institutional Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in enrollments %}
+            <tr>
+                <td class="text-muted" style="font-size: 0.875rem;">{{ e.date_enrolled|date:"M d, Y" }}</td>
+                <td class="font-bold" style="color: var(--slate-900);">{{ e.student.username }}</td>
+                <td class="font-semibold text-primary">{{ e.course.name }}</td>
+                <td><span class="badge badge-good">Year {{ e.year_of_study }}</span></td>
+                <td>
+                    <div class="flex gap-0-5" style="justify-content: flex-end;">
+                        <a href="/process_enrollment/{{ e.id }}/accept/" class="btn btn-primary" style="background: var(--success); font-size: 0.8rem; padding: 0.4rem 0.8rem;">Grant Admission</a>
+                        <a href="/process_enrollment/{{ e.id }}/reject/" class="btn btn-outline" style="color: var(--danger); border-color: var(--danger); font-size: 0.8rem; padding: 0.4rem 0.8rem;">Reject</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center p-3 text-muted">The institutional admission queue is currently clear.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

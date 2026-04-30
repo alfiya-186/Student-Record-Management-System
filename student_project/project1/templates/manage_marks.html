@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-2xl font-bold">Academic Record Center</h2>
+        <p class="text-muted">Certified grading and performance management for active students.</p>
+    </div>
+    <div class="flex gap-1 flex-center">
+        <span class="badge badge-good" style="padding: 0.6rem 1rem;">Official Registry</span>
+        <a href="/admin_dashboard/" class="btn btn-outline" style="padding: 0.5rem 1rem;">Back</a>
+    </div>
+</div>
+
+<div class="table-responsive glass">
+    <table>
+        <thead>
+            <tr>
+                <th>Institutional Profile</th>
+                <th>Program Registry</th>
+                <th>Academic Year</th>
+                <th>Current Rating</th>
+                <th style="text-align: right;">Certification Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in enrollments %}
+            <tr>
+                <td class="font-bold" style="color: var(--slate-900);">{{ e.student.username }}</td>
+                <td class="font-semibold text-primary">{{ e.course.name }}</td>
+                <td><span class="badge badge-good">Year {{ e.year_of_study }}</span></td>
+                <td>
+                    <span class="badge {% if e.performance_rating >= 4.0 %}badge-excellent{% elif e.performance_rating >= 3.0 %}badge-good{% else %}badge-poor{% endif %}" style="min-width: 60px; justify-content: center;">
+                        ★ {{ e.performance_rating }}
+                    </span>
+                </td>
+                <td>
+                    <div class="flex" style="justify-content: flex-end;">
+                        <a href="/enter_marks/{{ e.id }}/" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.4rem 1rem;">Process Marks</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center p-3 text-muted">No students currently enrolled in active academic programs.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

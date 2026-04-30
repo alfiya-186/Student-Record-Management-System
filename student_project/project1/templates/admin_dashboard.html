@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-2xl font-bold">Administration Hub</h2>
+        <p class="text-muted">Global institutional oversight and academic lifecycle management.</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Active Programs -->
+    <div class="glass card-hover stat-card">
+        <p class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Academic Catalog</p>
+        <div class="stat-value text-primary">{{ total_courses }}</div>
+        <p class="text-sm text-muted mb-2">Verified Programs</p>
+        <div class="mt-auto">
+            <a href="/manage_courses/" class="btn btn-outline w-full" style="border-radius: 8px;">Institutional Catalog</a>
+        </div>
+    </div>
+
+    <!-- Student Census -->
+    <div class="glass card-hover stat-card">
+        <p class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Student Census</p>
+        <div class="stat-value">{{ total_students }}</div>
+        <p class="text-sm text-muted mb-2">Active Profiles</p>
+        <div class="mt-auto">
+            <a href="/report_archive/" class="btn btn-outline w-full" style="border-radius: 8px;">View Profiles</a>
+        </div>
+    </div>
+
+    <!-- Admission Queue -->
+    <div class="glass card-hover stat-card" {% if pending_count > 0 %}style="border-top: 4px solid var(--warning);"{% else %}style="border-top: 4px solid var(--slate-200);"{% endif %}>
+        <p class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Admission Queue</p>
+        <div class="stat-value {% if pending_count > 0 %}text-warning{% endif %}">{{ pending_count }}</div>
+        <p class="text-sm text-muted mb-2">Applications Pending</p>
+        <div class="mt-auto">
+            {% if pending_count > 0 %}
+                <a href="/manage_enrollments/" class="btn btn-primary w-full" style="border-radius: 8px;">Review Queue</a>
+            {% else %}
+                <a href="/manage_enrollments/" class="btn btn-primary w-full" style="border-radius: 8px; opacity: 0.5; pointer-events: none;">Review Queue</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="glass mt-2 p-2-5" style="border-left: 6px solid var(--primary); display: flex; align-items: center; justify-content: space-between; gap: 2rem;">
+    <div>
+        <h3 class="mb-1">Academic Result Processing</h3>
+        <p class="text-muted text-sm">Input subject-level marks and verify final performance ratings for certification.</p>
+    </div>
+    <a href="/manage_marks/" class="btn btn-primary" style="padding: 1rem 2.5rem; flex-shrink: 0;">Access Record Center</a>
+</div>
+
+<div class="glass mt-2 p-2-5" style="border-left: 6px solid var(--success); display: flex; align-items: center; justify-content: space-between; gap: 2rem;">
+    <div>
+        <h3 class="mb-1 text-success" style="color: var(--success);">Institutional Performance Insights</h3>
+        <p class="text-muted text-sm">Access global analytics on student success rates, pass/fail metrics, and archived reports.</p>
+    </div>
+    <a href="/report_dashboard/" class="btn btn-outline" style="padding: 1rem 2.5rem; flex-shrink: 0; color: var(--success); border-color: var(--success);">Global Analytics</a>
+</div>
+{% endblock content %}

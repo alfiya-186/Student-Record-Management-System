@@ -1,0 +1,72 @@
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-2xl font-bold">Global Performance Registry</h2>
+        <p class="text-muted">Comprehensive history of institutional student reports and certified grading files.</p>
+    </div>
+    <div class="flex gap-1 flex-center">
+        <a href="/report_dashboard/" class="btn btn-outline" style="padding: 0.6rem 1rem;">Back</a>
+    </div>
+</div>
+
+<div class="table-responsive glass">
+    <table>
+        <thead>
+            <tr>
+                <th>Institutional ID</th>
+                <th>Candidate Name</th>
+                <th>Academic Program</th>
+                <th>Enrolled Year</th>
+                <th>Status</th>
+                <th>Grading Outcome</th>
+                <th style="text-align: right;">Final Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in enrollments %}
+            <tr>
+                <td class="text-primary font-bold" style="font-size: 0.8rem; font-family: 'Outfit';">{{ e.student.student.reg_no }}</td>
+                <td class="font-bold" style="color: var(--slate-900);">{{ e.student.username }}</td>
+                <td class="text-sm font-semibold">{{ e.course.name }}</td>
+                <td><span class="badge badge-good">Year {{ e.year_of_study }}</span></td>
+                <td>
+                    <span class="badge 
+                        {% if e.status == 'accepted' %}badge-good
+                        {% elif e.status == 'pending' %}badge-average
+                        {% else %}badge-poor{% endif %}">
+                        {{ e.status|title }}
+                    </span>
+                </td>
+                <td>
+                    {% if e.status == 'accepted' %}
+                        {% with passed=e.is_passed %}
+                            {% if passed is None %} <span class="text-muted text-xs uppercase font-bold">Ungraded</span>
+                            {% elif passed %} <span class="badge badge-excellent">Pass Certification</span>
+                            {% else %} <span class="badge badge-poor">Fail / Remedial</span>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        <span class="text-muted text-xs">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="flex" style="justify-content: flex-end;">
+                        {% if e.status == 'accepted' %}
+                            <strong class="{% if e.performance_rating >= 4.0 %}text-success{% elif e.performance_rating >= 2.0 %}text-primary{% else %}text-danger{% endif %}">
+                                ★ {{ e.performance_rating }}
+                            </strong>
+                        {% else %}
+                            <span class="text-muted text-xs">N/A</span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center p-3 text-muted">The institutional archive contains no verified records.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
