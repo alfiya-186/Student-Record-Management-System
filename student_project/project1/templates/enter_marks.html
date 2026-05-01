@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass max-w-md mx-auto p-2-5 my-2">
+    <div class="page-header" style="margin-bottom: 2rem;">
+        <div>
+            <h2 class="text-2xl font-bold">Certification Grading</h2>
+            <p class="text-muted text-sm">Recording subject-level marks for <strong>{{ enrollment.student.username }}</strong>.</p>
+        </div>
+        <a href="/manage_marks/" class="btn btn-outline text-sm">Back</a>
+    </div>
+    
+    <div class="mb-2 glass p-1-5" style="background: var(--slate-50); border-style: dashed;">
+        <p class="text-xs text-muted font-bold uppercase tracking-wide">Program Context</p>
+        <p class="font-bold text-primary">{{ enrollment.course.name }} &bull; Year {{ enrollment.year_of_study }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for subject in subjects %}
+        <div class="form-group">
+            <label>{{ subject.name }} (Max 100)</label>
+            <input type="number" name="subject_{{ subject.id }}" class="form-control" 
+                   value="{% for id, val in current_marks.items %}{% if id == subject.id %}{{ val }}{% endif %}{% endfor %}" 
+                   min="0" max="100" required>
+        </div>
+        {% empty %}
+        <div class="text-center p-2 text-muted">
+            No subjects defined for this program. Contact site administrator.
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary w-full mt-1">Certify Educational Marks</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="text-xl font-bold">{{ course.name }} - Program Report</h2>
+        <p class="text-muted">Detailed list of all students participating in the <strong class="text-primary">{{ course.duration }} Year</strong> program.</p>
+    </div>
+    <a href="/report_dashboard/" class="btn btn-outline">Back to Analytics</a>
+</div>
+
+<div class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>Registration</th>
+                <th>Student Name</th>
+                <th>Academic Year</th>
+                <th>Admissions Status</th>
+                <th>Performance Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in enrollments %}
+            <tr>
+                <td class="text-primary font-semibold text-sm">{{ e.student.student.reg_no }}</td>
+                <td class="font-bold">{{ e.student.username }}</td>
+                <td class="text-muted">Year {{ e.year_of_study }}</td>
+                <td>
+                    <span class="badge 
+                        {% if e.status == 'accepted' %}badge-good
+                        {% elif e.status == 'pending' %}badge-average
+                        {% else %}badge-poor{% endif %}">
+                        {{ e.status|title }}
+                    </span>
+                </td>
+                <td>
+                    {% if e.status == 'accepted' %}
+                        <strong class="{% if e.performance_rating >= 4.0 %}text-success{% elif e.performance_rating >= 2.0 %}text-primary{% else %}text-danger{% endif %}">
+                            ★ {{ e.performance_rating }}
+                        </strong>
+                    {% else %}
+                        <span class="text-muted text-xs uppercase tracking-wide">Review Required</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center p-3 text-muted">No student enrollments found for this specific program.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="glass mt-2 p-2" style="background: #f8fafc;">
+    <h3 class="font-bold mb-1">Program Summary</h3>
+    <p class="text-muted text-sm">
+        This program currently has <strong>{{ enrollments|length }}</strong> total applications. 
+        Institutional standards require a minimum of 40% (2.0★) for graduation certification.
+    </p>
+</div>
+{% endblock %}
