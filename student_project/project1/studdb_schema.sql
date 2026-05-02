@@ -19,9 +19,11 @@ CREATE TABLE core_course (
     duration INT DEFAULT 4
 );
 
--- Table for Student Details
+-- Table for Student Details (Updated with Full Name and Gender)
 CREATE TABLE core_student (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    gender VARCHAR(20) NOT NULL,
     reg_no VARCHAR(20) UNIQUE NOT NULL,
     user_id INT UNIQUE NOT NULL
 );

@@ -24,11 +24,16 @@
             <a href="/#about" class="btn btn-nav font-bold">About Us</a>
             {% if user.is_authenticated %}
             {% if user.userprofile.role == 'admin' %}
-            <a href="/admin_dashboard/" class="btn btn-nav font-bold">Admin Panel</a>
+            <a href="/admin_dashboard/" class="btn btn-nav font-bold">Admin Hub</a>
+            <a href="/manage_courses/" class="btn btn-nav font-bold">Manage Courses</a>
+            <a href="/manage_enrollments/" class="btn btn-nav font-bold">Admissions</a>
+            <a href="/report_dashboard/" class="btn btn-nav font-bold text-success">Institutional Analytics</a>
             {% elif user.userprofile.role == 'student' %}
             <a href="/student_dashboard/" class="btn btn-nav font-bold">Student Portal</a>
+            <a href="/enroll/" class="btn btn-nav font-bold text-primary">Apply for Course</a>
             {% elif user.userprofile.role == 'report' %}
-            <a href="/report_dashboard/" class="btn btn-nav font-bold">Analytics</a>
+            <a href="/report_dashboard/" class="btn btn-nav font-bold">Analytics Hub</a>
+            <a href="/report_archive/" class="btn btn-nav font-bold">Performance Archive</a>
             {% endif %}
 
             <div style="width: 1px; height: 16px; background: var(--slate-200); margin: 0 0.5rem;"></div>

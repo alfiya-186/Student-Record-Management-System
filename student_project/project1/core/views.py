@@ -24,28 +24,25 @@ def signup(request):
     if request.user.is_authenticated: return redirect('/')
     courses = Course.objects.all()
     if request.method == 'POST':
-        username = request.POST['username']
         full_name = request.POST.get('full_name', '')
         email = request.POST.get('email', '')
         gender = request.POST.get('gender', 'other')
         password = request.POST['password']
         confirm_password = request.POST['confirm_password']
         role = request.POST.get('role', 'student')
-        course_id = request.POST.get('course')
+        
+        username = email # Use email as the unique username
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
         elif User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists")
+            messages.error(request, "An account with this email already exists")
         else:
             user = User.objects.create_user(username=username, email=email, password=password)
             UserProfile.objects.create(user=user, role=role)
             if role == 'student':
                 reg_no = f"REG-{User.objects.count():05d}"
                 Student.objects.create(user=user, full_name=full_name, gender=gender, reg_no=reg_no)
-                if course_id:
-                    course = get_object_or_404(Course, id=course_id)
-                    Enrollment.objects.create(student=user, course=course, year_of_study=1)
             
             messages.success(request, "Registration successful. Please login.")
             return redirect('/login/')

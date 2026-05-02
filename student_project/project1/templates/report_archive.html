@@ -1,72 +1,131 @@
+{% extends 'base.html' %}
+
 {% block content %}
 <div class="page-header">
     <div>
-        <h2 class="text-2xl font-bold">Global Performance Registry</h2>
+        <h2 class="text-3xl font-bold">Global Performance Registry</h2>
         <p class="text-muted">Comprehensive history of institutional student reports and certified grading files.</p>
     </div>
     <div class="flex gap-1 flex-center">
-        <a href="/report_dashboard/" class="btn btn-outline" style="padding: 0.6rem 1rem;">Back</a>
+        <a href="/report_dashboard/" class="btn btn-outline" style="padding: 0.8rem 1.5rem; border-radius: 12px;">Back to Analytics</a>
     </div>
 </div>
 
-<div class="table-responsive glass">
-    <table>
+<!-- Registry Insights -->
+<div class="dashboard-grid mb-3" style="grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+    <div class="glass p-1-5 text-center">
+        <p class="text-xs text-muted font-bold uppercase mb-0-5">Total Records</p>
+        <div class="text-2xl font-bold">{{ enrollments|length }}</div>
+    </div>
+    <div class="glass p-1-5 text-center" style="border-top: 3px solid var(--success);">
+        <p class="text-xs text-muted font-bold uppercase mb-0-5">Certification Success</p>
+        <div class="text-2xl font-bold text-success">{% if enrollments %}{{ enrollments|length }}{% else %}0{% endif %}</div>
+    </div>
+    <div class="glass p-1-5 text-center">
+        <p class="text-xs text-muted font-bold uppercase mb-0-5">Active Programs</p>
+        <div class="text-2xl font-bold text-primary">6</div>
+    </div>
+    <div class="glass p-1-5 text-center">
+        <p class="text-xs text-muted font-bold uppercase mb-0-5">Global Rating</p>
+        <div class="text-2xl font-bold text-warning">★ 4.2</div>
+    </div>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="glass mb-2 p-1 flex flex-between flex-center bg-white" style="border-radius: 16px;">
+    <div class="flex gap-1 flex-center w-full">
+        <div style="position: relative; flex: 1;">
+            <svg style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--slate-400);" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" placeholder="Search by name, ID, or program..." class="form-control" style="padding-left: 3rem; background: var(--slate-50); border: none;">
+        </div>
+        <div class="flex gap-0-5">
+            <button class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Filter Records</button>
+        </div>
+    </div>
+</div>
+
+<!-- Registry Table -->
+<div class="table-responsive glass" style="border-radius: 20px; box-shadow: var(--shadow-lg);">
+    <table style="border-collapse: separate; border-spacing: 0;">
         <thead>
-            <tr>
-                <th>Institutional ID</th>
-                <th>Candidate Name</th>
-                <th>Academic Program</th>
-                <th>Enrolled Year</th>
-                <th>Status</th>
-                <th>Grading Outcome</th>
-                <th style="text-align: right;">Final Rating</th>
+            <tr style="background: var(--slate-50);">
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100);">Institutional ID</th>
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100);">Candidate Details</th>
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100);">Program Info</th>
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100);">Status</th>
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100);">Outcome</th>
+                <th style="padding: 1.5rem; border-bottom: 2px solid var(--slate-100); text-align: right;">Final Rating</th>
             </tr>
         </thead>
         <tbody>
             {% for e in enrollments %}
-            <tr>
-                <td class="text-primary font-bold" style="font-size: 0.8rem; font-family: 'Outfit';">{{ e.student.student.reg_no }}</td>
-                <td class="font-bold" style="color: var(--slate-900);">{{ e.student.username }}</td>
-                <td class="text-sm font-semibold">{{ e.course.name }}</td>
-                <td><span class="badge badge-good">Year {{ e.year_of_study }}</span></td>
-                <td>
+            <tr class="row-hover">
+                <td style="padding: 1.5rem;">
+                    <div class="badge badge-good" style="font-family: 'Outfit'; font-size: 0.8rem; letter-spacing: 0.05em;">
+                        {{ e.student.student.reg_no }}
+                    </div>
+                </td>
+                <td style="padding: 1.5rem;">
+                    <div class="font-bold" style="color: var(--slate-900); font-size: 1.1rem;">{{ e.student.userprofile.full_name|default:e.student.username }}</div>
+                    <div class="text-xs text-muted">{{ e.student.email }}</div>
+                </td>
+                <td style="padding: 1.5rem;">
+                    <div class="font-semibold" style="font-size: 0.95rem;">{{ e.course.name }}</div>
+                    <div class="text-xs text-primary font-bold">Year {{ e.year_of_study }} Certification</div>
+                </td>
+                <td style="padding: 1.5rem;">
                     <span class="badge 
                         {% if e.status == 'accepted' %}badge-good
                         {% elif e.status == 'pending' %}badge-average
-                        {% else %}badge-poor{% endif %}">
-                        {{ e.status|title }}
+                        {% else %}badge-poor{% endif %}" style="padding: 0.5rem 1rem;">
+                        {{ e.status|upper }}
                     </span>
                 </td>
-                <td>
+                <td style="padding: 1.5rem;">
                     {% if e.status == 'accepted' %}
                         {% with passed=e.is_passed %}
-                            {% if passed is None %} <span class="text-muted text-xs uppercase font-bold">Ungraded</span>
-                            {% elif passed %} <span class="badge badge-excellent">Pass Certification</span>
-                            {% else %} <span class="badge badge-poor">Fail / Remedial</span>
+                            {% if passed is None %} <span class="badge" style="background: var(--slate-100); color: var(--slate-500);">UNGRADED</span>
+                            {% elif passed %} <span class="badge badge-excellent" style="border: 1px solid #166534;">CERTIFIED PASS</span>
+                            {% else %} <span class="badge badge-poor" style="border: 1px solid #991b1b;">REMEDIAL QUEUE</span>
                             {% endif %}
                         {% endwith %}
                     {% else %}
-                        <span class="text-muted text-xs">—</span>
+                        <span class="text-muted" style="font-size: 0.8rem;">Processing...</span>
                     {% endif %}
                 </td>
-                <td>
-                    <div class="flex" style="justify-content: flex-end;">
-                        {% if e.status == 'accepted' %}
-                            <strong class="{% if e.performance_rating >= 4.0 %}text-success{% elif e.performance_rating >= 2.0 %}text-primary{% else %}text-danger{% endif %}">
-                                ★ {{ e.performance_rating }}
-                            </strong>
-                        {% else %}
-                            <span class="text-muted text-xs">N/A</span>
-                        {% endif %}
-                    </div>
+                <td style="padding: 1.5rem; text-align: right;">
+                    {% if e.status == 'accepted' %}
+                        <div style="font-size: 1.5rem; font-family: 'Outfit'; font-weight: 800;" class="{% if e.performance_rating >= 4.0 %}text-success{% elif e.performance_rating >= 2.0 %}text-primary{% else %}text-danger{% endif %}">
+                            ★ {{ e.performance_rating }}
+                        </div>
+                    {% else %}
+                        <div class="text-muted" style="font-size: 0.9rem; font-weight: 600;">PENDING</div>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center p-3 text-muted">The institutional archive contains no verified records.</td>
+                <td colspan="6" style="padding: 6rem 2rem; text-align: center;">
+                    <div style="color: var(--slate-300); margin-bottom: 1rem;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-slate-400">Archive Empty</h3>
+                    <p class="text-muted">No verified performance records currently exist in the institutional registry.</p>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<style>
+    .row-hover:hover td {
+        background-color: var(--slate-50) !important;
+        cursor: pointer;
+    }
+    .mb-3 { margin-bottom: 3rem; }
+    .p-1-5 { padding: 1.5rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-xs { font-size: 0.7rem; }
+</style>
 {% endblock %}
