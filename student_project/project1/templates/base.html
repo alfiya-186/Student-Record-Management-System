@@ -20,8 +20,10 @@
             EduCore
         </a>
         <div class="nav-links">
+            {% if not user.is_authenticated %}
             <a href="/" class="btn btn-nav font-bold">Home</a>
             <a href="/#about" class="btn btn-nav font-bold">About Us</a>
+            {% endif %}
             {% if user.is_authenticated %}
             {% if user.userprofile.role == 'admin' %}
             <a href="/admin_dashboard/" class="btn btn-nav font-bold">Admin Hub</a>

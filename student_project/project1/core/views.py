@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Student, UserProfile, Course, Enrollment, Subject, SubjectMark
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 
 def index(request):
     if request.user.is_authenticated:
@@ -38,7 +38,17 @@ def signup(request):
         elif User.objects.filter(username=username).exists():
             messages.error(request, "An account with this email already exists")
         else:
-            user = User.objects.create_user(username=username, email=email, password=password)
+            name_parts = full_name.split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+            
+            user = User.objects.create_user(
+                username=username, 
+                email=email, 
+                password=password,
+                first_name=first_name,
+                last_name=last_name
+            )
             UserProfile.objects.create(user=user, role=role)
             if role == 'student':
                 reg_no = f"REG-{User.objects.count():05d}"
@@ -185,6 +195,11 @@ def enter_marks(request, enrollment_id):
     if request.method == 'POST':
         for subject in subjects:
             mark_val = request.POST.get(f'subject_{subject.id}', 0)
+            try:
+                mark_val = int(mark_val)
+            except (ValueError, TypeError):
+                mark_val = 0
+                
             SubjectMark.objects.update_or_create(
                 enrollment=enrollment, subject=subject,
                 defaults={'marks': mark_val}
@@ -222,8 +237,24 @@ def report_dashboard(request):
 @login_required
 def report_archive(request):
     if not (request.user.userprofile.role in ['report', 'admin']): return redirect('/')
+    
+    query = request.GET.get('q', '').strip()
+    
+    # Validation: limit query length to prevent excessive resource usage
+    if len(query) > 100:
+        query = query[:100]
+        
     enrollments = Enrollment.objects.all().order_by('-date_enrolled')
-    return render(request, 'report_archive.html', {'enrollments': enrollments})
+    
+    if query:
+        enrollments = enrollments.filter(
+            Q(student__username__icontains=query) |
+            Q(student__student__full_name__icontains=query) |
+            Q(student__student__reg_no__icontains=query) |
+            Q(course__name__icontains=query)
+        ).distinct()
+        
+    return render(request, 'report_archive.html', {'enrollments': enrollments, 'query': query})
 
 @login_required
 def course_detail_report(request, course_id):
