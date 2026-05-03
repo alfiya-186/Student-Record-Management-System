@@ -29,4 +29,5 @@ urlpatterns = [
     path('report_dashboard/', views.report_dashboard),
     path('report_archive/', views.report_archive),
     path('course_report/<int:course_id>/', views.course_detail_report),
+    path('generate_report/<int:enrollment_id>/', views.generate_report),
 ]

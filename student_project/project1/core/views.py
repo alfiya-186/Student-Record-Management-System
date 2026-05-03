@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Student, UserProfile, Course, Enrollment, Subject, SubjectMark
+from .models import Student, UserProfile, Course, Enrollment, Subject, SubjectMark, PerformanceReport
 from django.db.models import Avg, Count, Q
 
 def index(request):
@@ -81,7 +81,6 @@ def student_dashboard(request):
     if request.user.userprofile.role != 'student': return redirect('/')
     
     enrollments = Enrollment.objects.filter(student=request.user).order_by('-date_enrolled')
-    # Use property: enrollment.performance_rating
     return render(request, 'student_dashboard.html', {'enrollments': enrollments})
 
 @login_required
@@ -263,3 +262,42 @@ def course_detail_report(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     enrollments = Enrollment.objects.filter(course=course).order_by('status', 'student__username')
     return render(request, 'course_report.html', {'course': course, 'enrollments': enrollments})
+
+# --- GENERATE REPORT ---
+
+@login_required
+def generate_report(request, enrollment_id):
+    if not (request.user.userprofile.role in ['report', 'admin']): return redirect('/')
+    
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+    
+    if enrollment.status != 'accepted':
+        messages.error(request, "Reports can only be generated for accepted enrollments.")
+        return redirect('/report_archive/')
+    
+    marks = enrollment.subject_marks.all()
+    if not marks.exists():
+        messages.error(request, f"No marks have been entered yet for {enrollment.student.username}. Please enter marks first.")
+        return redirect('/report_archive/')
+    
+    percentage = round(enrollment.average_percentage, 2)
+    rating     = enrollment.performance_rating
+    grade      = PerformanceReport.compute_grade(percentage)
+    passed     = percentage >= 40
+    remarks    = PerformanceReport.compute_remarks(percentage)
+    
+    report, created = PerformanceReport.objects.update_or_create(
+        enrollment=enrollment,
+        defaults={
+            'generated_by': request.user,
+            'percentage':   percentage,
+            'rating':       rating,
+            'grade':        grade,
+            'is_passed':    passed,
+            'remarks':      remarks,
+        }
+    )
+    
+    action = "Generated" if created else "Updated"
+    messages.success(request, f"Report {action}: {enrollment.student.username} — {enrollment.course.name} [{grade}]")
+    return redirect('/report_archive/')

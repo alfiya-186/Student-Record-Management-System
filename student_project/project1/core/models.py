@@ -92,3 +92,42 @@ class SubjectMark(models.Model):
 
     def __str__(self):
         return f"{self.enrollment.student.username} - {self.subject.name}: {self.marks}"
+
+class PerformanceReport(models.Model):
+    GRADE_CHOICES = (
+        ('A+', 'Outstanding (A+)'),
+        ('A',  'Excellent (A)'),
+        ('B',  'Good (B)'),
+        ('C',  'Average (C)'),
+        ('D',  'Below Average (D)'),
+        ('F',  'Fail (F)'),
+    )
+    enrollment      = models.OneToOneField(Enrollment, on_delete=models.CASCADE, related_name='performance_report')
+    generated_by    = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='generated_reports')
+    generated_at    = models.DateTimeField(auto_now=True)
+    percentage      = models.FloatField(default=0.0)
+    rating          = models.FloatField(default=0.0)
+    grade           = models.CharField(max_length=3, choices=GRADE_CHOICES, default='F')
+    is_passed       = models.BooleanField(default=False)
+    remarks         = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return f"Report: {self.enrollment.student.username} - {self.enrollment.course.name} [{self.grade}]"
+
+    @staticmethod
+    def compute_grade(percentage):
+        if percentage >= 90: return 'A+'
+        if percentage >= 75: return 'A'
+        if percentage >= 65: return 'B'
+        if percentage >= 50: return 'C'
+        if percentage >= 40: return 'D'
+        return 'F'
+
+    @staticmethod
+    def compute_remarks(percentage):
+        if percentage >= 90: return "Outstanding performance. The student has demonstrated exceptional mastery of all subjects."
+        if percentage >= 75: return "Excellent academic achievement. The student consistently performs above expectations."
+        if percentage >= 65: return "Good performance. The student demonstrates solid understanding of the coursework."
+        if percentage >= 50: return "Satisfactory performance. The student meets the required academic standards."
+        if percentage >= 40: return "Below average performance. The student requires additional academic support."
+        return "The student has not met the minimum passing criteria. Remedial action is recommended."

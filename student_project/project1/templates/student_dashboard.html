@@ -81,6 +81,48 @@
                 Review in progress. Our academic committee is verifying your application details.
             </div>
         {% endif %}
+
+        {# --- Performance Report Block (shown when report has been generated) --- #}
+        {% if enrollment.status == 'accepted' %}
+            {% with rpt=enrollment.performance_report %}
+            {% if rpt %}
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px dashed var(--slate-200);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                    <span style="font-size: 1.3rem;">📋</span>
+                    <h4 class="font-bold" style="font-size: 1.1rem; color: var(--slate-900);">Official Academic Report</h4>
+                    <span class="badge badge-good" style="font-size: 0.65rem; margin-left: auto;">Issued by Institution</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem;">
+                    <div style="background: var(--slate-50); border-radius: 12px; padding: 1rem; text-align: center;">
+                        <p style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--slate-400); margin-bottom: 0.25rem;">Grade</p>
+                        <div style="font-size: 2rem; font-weight: 900; font-family: 'Outfit'; color: var(--primary);">{{ rpt.grade }}</div>
+                    </div>
+                    <div style="background: var(--slate-50); border-radius: 12px; padding: 1rem; text-align: center;">
+                        <p style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--slate-400); margin-bottom: 0.25rem;">Percentage</p>
+                        <div style="font-size: 1.75rem; font-weight: 900; font-family: 'Outfit';" class="{% if rpt.percentage >= 75 %}text-success{% elif rpt.percentage >= 40 %}text-primary{% else %}text-danger{% endif %}">{{ rpt.percentage }}%</div>
+                    </div>
+                    <div style="background: var(--slate-50); border-radius: 12px; padding: 1rem; text-align: center;">
+                        <p style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--slate-400); margin-bottom: 0.25rem;">Rating</p>
+                        <div style="font-size: 1.75rem; font-weight: 900; font-family: 'Outfit'; color: var(--primary);">★ {{ rpt.rating }}</div>
+                    </div>
+                    <div style="background: var(--slate-50); border-radius: 12px; padding: 1rem; text-align: center;">
+                        <p style="font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--slate-400); margin-bottom: 0.25rem;">Result</p>
+                        {% if rpt.is_passed %}
+                            <div class="badge badge-excellent" style="font-size: 0.85rem; margin: 0.5rem auto 0;">PASS</div>
+                        {% else %}
+                            <div class="badge badge-poor" style="font-size: 0.85rem; margin: 0.5rem auto 0;">FAIL</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="background: #f0f9ff; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 12px 12px 0;">
+                    <p style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 0.35rem;">Institutional Remarks</p>
+                    <p style="font-size: 0.9rem; color: var(--slate-700); font-style: italic;">{{ rpt.remarks }}</p>
+                    <p style="font-size: 0.65rem; color: var(--slate-400); margin-top: 0.5rem;">Issued by: <strong>{{ rpt.generated_by.username }}</strong> · {{ rpt.generated_at|date:"d M Y, H:i" }}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+        {% endif %}
     </div>
     {% empty %}
     <div class="glass p-3 text-center" style="border-style: dashed; border-width: 2px;">
