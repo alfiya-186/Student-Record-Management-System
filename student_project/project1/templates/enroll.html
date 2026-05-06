@@ -22,7 +22,7 @@
             <select name="course" id="course_select" class="form-control" required onchange="updateYearOptions()">
                 <option value="">-- Select Instituional Program --</option>
                 {% for course in courses %}
-                    <option value="{{ course.id }}" data-duration="{{ course.duration }}">{{ course.name }}</option>
+                    <option value="{{ course.id }}" data-duration="{{ course.duration }}">{{ course.name }} ({{ course.duration }} Yrs)</option>
                 {% endfor %}
             </select>
         </div>
