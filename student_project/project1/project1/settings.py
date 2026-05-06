@@ -26,7 +26,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
     'DJANGO_ALLOWED_HOSTS',
-    'alfiyaismail.com,www.alfiyaismail.com,localhost,127.0.0.1'
+    '*,alfiyaismail.com,www.alfiyaismail.com,localhost,127.0.0.1'
 ).split(',')
 
 # ── Application definition ──────────────────────────────────────────────────
