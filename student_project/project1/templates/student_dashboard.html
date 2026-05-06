@@ -84,6 +84,7 @@
 
         {# --- Performance Report Block (shown when report has been generated) --- #}
         {% if enrollment.status == 'accepted' %}
+            {% if enrollment.has_performance_report %}
             {% with rpt=enrollment.performance_report %}
             {% if rpt %}
             <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px dashed var(--slate-200);">
@@ -122,6 +123,7 @@
             </div>
             {% endif %}
             {% endwith %}
+            {% endif %}
         {% endif %}
     </div>
     {% empty %}

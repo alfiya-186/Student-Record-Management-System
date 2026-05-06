@@ -60,6 +60,10 @@ class Enrollment(models.Model):
         return f"{self.student.username} - {self.course.name} ({self.status})"
 
     @property
+    def has_performance_report(self):
+        return hasattr(self, 'performance_report')
+
+    @property
     def performance_rating(self):
         marks = self.subject_marks.all()
         if not marks.exists():

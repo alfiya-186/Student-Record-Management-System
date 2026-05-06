@@ -78,14 +78,14 @@ def user_logout(request):
 
 @login_required
 def student_dashboard(request):
-    if request.user.userprofile.role != 'student': return redirect('/')
+    if not hasattr(request.user, 'userprofile') or request.user.userprofile.role != 'student': return redirect('/')
     
     enrollments = Enrollment.objects.filter(student=request.user).order_by('-date_enrolled')
     return render(request, 'student_dashboard.html', {'enrollments': enrollments})
 
 @login_required
 def enroll_course(request):
-    if request.user.userprofile.role != 'student': return redirect('/')
+    if not hasattr(request.user, 'userprofile') or request.user.userprofile.role != 'student': return redirect('/')
     
     if request.method == 'POST':
         course_id = request.POST['course']
@@ -109,7 +109,7 @@ def enroll_course(request):
 
 @login_required
 def admin_dashboard(request):
-    if request.user.userprofile.role != 'admin': return redirect('/')
+    if not hasattr(request.user, 'userprofile') or request.user.userprofile.role != 'admin': return redirect('/')
     
     pending_count = Enrollment.objects.filter(status='pending').count()
     total_students = Student.objects.count()
